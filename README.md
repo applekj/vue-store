@@ -1,4 +1,4 @@
-# vue-music
+# vue-store
 
 ## Project setup
 ```
