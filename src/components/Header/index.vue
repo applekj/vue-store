@@ -56,12 +56,15 @@ export default {
                 {
                     name: 'search',
                     params: { keyword: this.keyword },
-                    query: {
-                        k: this.keyword
-                    }
+                    query: this.$route.query
                 }
             )
         }
+    },
+    mounted() {
+        this.$bus.$on('clear', () => {
+            this.keyword = ''
+        })
     }
 }
 </script>

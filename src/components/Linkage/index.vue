@@ -2,34 +2,37 @@
     <div class="type-nav">
         <div class="container">
             <div @mouseleave="leaveIndex()">
-                <h2 class="all" @mouseenter="showShop">全部商品分类</h2>
-                <div class="sort" v-show="show">
-                    <div class="all-sort-list2" @click="goSearch">
-                        <div class="item" v-for="(c1, index) in categoryList" :key="c1.categoryId"
-                            :class="currentIndex == index ? 'cur' : ''">
-                            <h3 @mouseenter="changeIndex(index)">
-                                <a href="" :data-categoryname="c1.categoryName" :data-category1Id="c1.categoryId">{{
-                                    c1.categoryName }}</a>
-                            </h3>
-                            <div class="item-list clearfix" :style="{ display: currentIndex == index ? 'block' : 'none' }">
-                                <div class="subitem" v-for="c2 in c1.categoryChild" :key="c2.categoryId">
-                                    <dl class="fore">
-                                        <dt>
-                                            <a href="" :data-categoryname="c2.categoryName"
-                                                :data-category2Id="c2.categoryId">{{ c2.categoryName }}</a>
-                                        </dt>
-                                        <dd>
-                                            <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
-                                                <a href="" :data-categoryname="c3.categoryName"
-                                                    :data-category2Id="c3.categoryId">{{ c3.categoryName }}</a>
-                                            </em>
-                                        </dd>
-                                    </dl>
+                <h2 class="all" @mouseenter="handlerShowList">全部商品分类</h2>
+                <transition name="sort">
+                    <div class="sort" v-show="show">
+                        <div class="all-sort-list2" @click="goSearch">
+                            <div class="item" v-for="(c1, index) in categoryList" :key="c1.categoryId"
+                                :class="currentIndex == index ? 'cur' : ''">
+                                <h3 @mouseenter="changeIndex(index)">
+                                    <a href="" :data-categoryname="c1.categoryName" :data-category1Id="c1.categoryId">{{
+                                        c1.categoryName }}</a>
+                                </h3>
+                                <div class="item-list clearfix"
+                                    :style="{ display: currentIndex == index ? 'block' : 'none' }">
+                                    <div class="subitem" v-for="c2 in c1.categoryChild" :key="c2.categoryId">
+                                        <dl class="fore">
+                                            <dt>
+                                                <a href="" :data-categoryname="c2.categoryName"
+                                                    :data-category2Id="c2.categoryId">{{ c2.categoryName }}</a>
+                                            </dt>
+                                            <dd>
+                                                <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
+                                                    <a href="" :data-categoryname="c3.categoryName"
+                                                        :data-category3Id="c3.categoryId">{{ c3.categoryName }}</a>
+                                                </em>
+                                            </dd>
+                                        </dl>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </transition>
             </div>
             <nav class="nav">
                 <a href="###">服装城</a>
@@ -52,26 +55,17 @@ import _ from 'lodash'
 
 export default {
     name: 'Linkage',
+    props: ['showList'],
     data() {
         return {
             currentIndex: -1,
-            show: true
-        }
-    },
-    mounted() {
-        this.$store.dispatch('categoryList')
-        if (this.$route.path == '/home') {
-            this.show = true
-        } else {
-            this.show = false
+            show: this.showList === undefined ? true : this.showList
         }
     },
     computed: {
         ...mapState({
             categoryList: state => {
-                const arr = state.home.categoryList
-                arr.pop()
-                return arr
+                return state.home.categoryList
             }
         })
     },
@@ -81,7 +75,7 @@ export default {
         }, 50),
         leaveIndex() {
             this.currentIndex = -1
-            if (this.$route.path == '/search') {
+            if (this.showList === false) {
                 this.show = false
             }
         },
@@ -92,15 +86,16 @@ export default {
             this.$router.push({
                 name: 'search',
                 query: {
-                    category1id,
-                    category2id,
-                    category3id,
-                    categoryname
-                }
+                    category1Id: category1id,
+                    category2Id: category2id,
+                    category3Id: category3id,
+                    categoryName: categoryname,
+                },
+                params: this.$route.params
             })
         },
-        showShop() {
-            if (this.$route.path == '/search') {
+        handlerShowList() {
+            if (!this.show) {
                 this.show = true
             }
         }
